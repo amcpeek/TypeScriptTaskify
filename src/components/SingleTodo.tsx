@@ -1,17 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Todo } from './components/model';
+import { Todo } from './model';
 import {AiFillEdit, AiFillDelete } from 'react-icons/ai'
 import { MdDone} from 'react-icons/md'
+import { Draggable } from '@hello-pangea/dnd';
 
 
 type Props = {
+    index:number
     todo:Todo
     todos: Todo[];
     setTodos: React.Dispatch<React.SetStateAction<Todo[]>>
 
 }
 
-const SingleTodo = ({todo, todos, setTodos}: Props) => {
+const SingleTodo = ({index, todo, todos, setTodos}: Props) => {
     const [edit, setEdit] = useState<boolean>(false)
     const [editTodo, setEditTodo] = useState<string>(todo.todo)
     const handleDone = (id:number) => {
@@ -46,7 +48,15 @@ const SingleTodo = ({todo, todos, setTodos}: Props) => {
 
 
   return (
-    <form className='todos_single' onSubmit={(e)=>handleEdit(e, todo.id)}>
+    <Draggable draggableId={todo.id.toString()} index={index}>
+        {(provided, snapshot) => (
+    <form
+    className={`todos_single ${snapshot.isDragging? "drag": ''}`}
+    onSubmit={(e)=>handleEdit(e, todo.id)}
+    {...provided.draggableProps}
+    {...provided.dragHandleProps}
+    ref={provided.innerRef}
+    >
         {
             edit? (
                 <input
@@ -74,6 +84,9 @@ const SingleTodo = ({todo, todos, setTodos}: Props) => {
         </div>
 
     </form>
+
+        )}
+    </Draggable>
   )
 }
 
